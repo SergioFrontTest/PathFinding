@@ -1,0 +1,4 @@
+nlohmann/json
+
+https://stackoverflow.com/questions/48659797/how-to-setup-json-library-in-c-microsoft-visual-studio
+https://github.com/nlohmann/json
