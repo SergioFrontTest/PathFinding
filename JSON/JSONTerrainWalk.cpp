@@ -109,7 +109,7 @@ namespace JSONTerrainWalk {
 
 bool saveTerrainWalksToFileDialogBox(Terrain* pTerrain)
 {
-	std::wstring path = JSON::getSaveFilePath();
+	std::wstring path = getSaveFilePath();
 	if (path.length() > 0)
 	{
 		// Transfer TerrainWalk arrays to the JSON arrays

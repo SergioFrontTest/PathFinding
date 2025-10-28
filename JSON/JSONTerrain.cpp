@@ -167,7 +167,7 @@ std::optional<MapData> load_map_data(const std::wstring& filename) { // <-- Upda
 
 bool loadTerrainFromFileDialogBox(Terrain* pTerrain)
 {
-	std::wstring path = JSON::getLoadFilePath();
+	std::wstring path = getLoadFilePath();
 	if (path.length() > 0)
 	{
 		// Read JSON file

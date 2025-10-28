@@ -1,52 +1,43 @@
 #include "JSON.h"
 
-// Include the nlohmann/json library header
-#include "../Third Party/JSON/json.hpp"
-using json = nlohmann::json;
-
+#define _WIN32_WINNT 0x0A00  // Windows 10
+#include <afxwin.h>
 #include <fstream>
 #include <afxdlgs.h>  // For CFileDialog
+#include <string>
+#include <algorithm>
+#include <locale>
 
-bool JSON::convertToTerrain(CString jsonDataSource, Terrain* pTerrainDestination)
+void replaceString(std::wstring& stringToModify, const std::wstring& stringToSearch, const std::wstring& replacementString)
 {
-	return true;
+	size_t pos = 0;
+	while ((pos = stringToModify.find(stringToSearch, pos)) != std::wstring::npos)
+	{
+		stringToModify.replace(pos, stringToSearch.length(), replacementString);
+		pos += replacementString.length(); // Move past the replacement
+	}
 }
 
-CString JSON::convertFromTerrain(Terrain* pTerrainSource)
+void makeStringLowercase(std::wstring& stringToLowerCase)
 {
-	return "";
+	std::locale loc;
+	std::transform(stringToLowerCase.begin(), stringToLowerCase.end(), stringToLowerCase.begin(), [&loc](wchar_t c)
+	{
+		return std::tolower(c, loc);
+	});
 }
 
-bool JSON::convertToMovements(CString jsonDataSource, Movements* pMovementsDestination)
+std::wstring getFolder(const std::wstring& path)
 {
-	return true;
+	size_t pos = path.find_last_of(L"\\/"); // Handles both '/' and '\'
+	if (pos != std::wstring::npos)
+	{
+		return path.substr(0, pos + 1); // Include the trailing slash/backslash
+	}
+	return L""; // No folder found
 }
 
-CString JSON::convertFromMovements(Movements* pMovementsSource)
-{
-	return "";
-}
-
-CString JSON::loadFromFile(CString fullPathFilename)
-{
-	// read a JSON file
-	std::ifstream i("file.json");
-	json j;
-	i >> j;
-
-	// write prettified JSON to another file
-	std::ofstream o("pretty.json");
-	o << std::setw(4) << j << std::endl;
-
-	return "";
-}
-
-bool JSON::saveToFile(CString fullPathFilename, CString jsonDataSource)
-{
-	return true;
-}
-
-std::wstring GetModulePath()
+std::wstring GetModulePathNoExe()
 {
 	wchar_t buffer[MAX_PATH];
 	DWORD length = GetModuleFileNameW(nullptr, buffer, MAX_PATH);
@@ -55,13 +46,14 @@ std::wstring GetModulePath()
 		// Handle error or truncation
 		return L"";
 	}
-	return std::wstring(buffer, length);
+	std::wstring path(buffer, length);
+	return getFolder(path);
 }
 
-std::wstring JSON::getLoadFilePath()
+std::wstring getLoadFilePath()
 {
 	// Use initially the same folder as the app binary file
-	static std::wstring g_wpath = GetModulePath();
+	static std::wstring g_wpath = GetModulePathNoExe() + L"data.json";
 
 	// Convert filename string to MFC string for MFC file open dialog
 	CString path(g_wpath.c_str());
@@ -85,10 +77,10 @@ std::wstring JSON::getLoadFilePath()
 	return L"";
 }
 
-std::wstring JSON::getSaveFilePath()
+std::wstring getSaveFilePath()
 {
 	// Use initially the same folder as the app binary file
-	static std::wstring g_wpath = GetModulePath() + L"data.json";
+	static std::wstring g_wpath = GetModulePathNoExe() + L"data.json";
 
 	// Convert filename string to MFC string for MFC file open dialog
 	CString path(g_wpath.c_str());
